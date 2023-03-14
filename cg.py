@@ -3,27 +3,30 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQGLViewer import *
 from OpenGL.GL import *
-from CGAL.CGAL_Kernel import Point_3
-from CGAL import Point_generators_3
+
 import random
 def drawPoint(x, y, z):
-     glBegin(GL_QUADS)
-     glVertex3f(x-0.1,y-0.1,z)
-     glVertex3f(x-0.1,y+0.1,z)
-     glVertex3f(x+0.1,y+0.1,z)
-     glVertex3f(x+0.1,y-0.1,z)
+     glPointSize(12)
+     glEnable(GL_POINT_SMOOTH)
+     glBegin(GL_POINTS)
+     glVertex3f(x,y,z)
      glEnd()
 def genereatePointsInCube(vertexes):
     for i in range(1,random.randint(10,20)):
-        vertexes.append((random.uniform(-1, 1),random.uniform(-1, 1),random.uniform(-1, 1)))
-def genereatePointsInSphere():
-    Point_generators_3.Random_points_in_sphere_3()
+        vertexes.append((random.uniform(0, 1),random.uniform(0, 1),random.uniform(0, 1)))
+def genereatePointsInSphere(vertexes):
+    
+    R = 5
+    for i in range(1,100):
+        vertexes.append((R*random.uniform(0,1)*random.uniform(-1,1), R*random.uniform(0,1)*random.uniform(-1,1), R*random.uniform(0,1)))
 class Viewer(QGLViewer):
-    vertexes = [(1,1,1),(1,1,-0.5),
-    (1,-1,-1),(1,-1,1),(-1,1,1),(-1,-1,-1),(-1,-1,1),(-1, 1,-1)]
+    vertexes = [
+        (0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1)
+    ]
     def __init__(self,parent = None):
         QGLViewer.__init__(self,parent)
     def draw(self):
+        print(self.vertexes)
         for i in self.vertexes:
             drawPoint(*i)
     def keyPressEvent(self,e):
@@ -35,11 +38,12 @@ class Viewer(QGLViewer):
         elif(e.nativeVirtualKey()==Qt.Key_E):
             self.vertexes = []
         elif(e.nativeVirtualKey()==Qt.Key_Q):
-            self.vertexes = [(1,1,1),(1,1,-1),(1,-1,-1),(1,-1,1),(-1,1,1),(-1,-1,-1),(-1,-1,1),(-1, 1,-1)]
+            self.vertexes = [(0,0,0), (0,0,1), (0,1,0), (0,1,1), (1,0,0), (1,0,1), (1,1,0), (1,1,1)]
         elif(e.nativeVirtualKey()==Qt.Key_R):
             genereatePointsInCube(self.vertexes)
         elif(e.nativeVirtualKey()==Qt.Key_S):
-           genereatePointsInSphere()
+           self.vertexes = []
+           genereatePointsInSphere(self.vertexes)
         self.updateGL()
 
 
